@@ -97,7 +97,7 @@
 
 ## 致谢
 
-- [OpenClaw](https://jvbmlo28x0.feishu.cn/wiki/IrlDweqdIi77azkojinciG8xn4d) - 灵感来源
+- [OpenClaw](https://github.com/openclaw/openclaw) - 灵感来源
 - 飞书开放平台 - API 文档支持
 - 所有使用者和贡献者
 

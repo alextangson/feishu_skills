@@ -1,0 +1,54 @@
+{
+  "config": { "wide_screen_mode": true },
+  "header": {
+    "title": { "tag": "plain_text", "content": "Morning Briefing | {{date}}" },
+    "template": "blue"
+  },
+  "elements": [
+    {
+      "tag": "div",
+      "text": {
+        "tag": "lark_md",
+        "content": "{{anomalies_section}}"
+      }
+    },
+    { "tag": "hr" },
+    {
+      "tag": "div",
+      "text": {
+        "tag": "lark_md",
+        "content": "**Today's Action Queue**\n{{actions_list}}"
+      }
+    },
+    { "tag": "hr" },
+    {
+      "tag": "action",
+      "actions": [
+        {
+          "tag": "button",
+          "text": { "tag": "plain_text", "content": "Confirm & Execute" },
+          "type": "primary",
+          "value": { "action": "confirm_today", "date": "{{date}}" }
+        },
+        {
+          "tag": "button",
+          "text": { "tag": "plain_text", "content": "Adjust Priorities" },
+          "type": "default",
+          "value": { "action": "adjust_priority", "date": "{{date}}" }
+        },
+        {
+          "tag": "button",
+          "text": { "tag": "plain_text", "content": "+ Add Task" },
+          "type": "default",
+          "value": { "action": "add_task", "date": "{{date}}" }
+        }
+      ]
+    },
+    {
+      "tag": "note",
+      "elements": [
+        { "tag": "plain_text", "content": "Generated at {{timestamp}} | Auto-synced to Bitable | Reply '确认' / '调整' / '加任务'" }
+      ]
+    }
+  ]
+}

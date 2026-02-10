@@ -1,0 +1,40 @@
+{
+  "config": { "wide_screen_mode": true },
+  "header": {
+    "title": { "tag": "plain_text", "content": "Skill Test | {{skill_name}} — {{result}}" },
+    "template": "{{template_color}}"
+  },
+  "elements": [
+    {
+      "tag": "div",
+      "text": {
+        "tag": "lark_md",
+        "content": "**Test #{{test_number}}** | {{date}}\n\n{{details}}\n\nPass count: **{{pass_count}}/3** needed for stable"
+      }
+    },
+    { "tag": "hr" },
+    {
+      "tag": "action",
+      "actions": [
+        {
+          "tag": "button",
+          "text": { "tag": "plain_text", "content": "Retest Now" },
+          "type": "default",
+          "value": { "action": "retest", "skill": "{{skill_name}}" }
+        },
+        {
+          "tag": "button",
+          "text": { "tag": "plain_text", "content": "Mark Stable" },
+          "type": "primary",
+          "value": { "action": "mark_stable", "skill": "{{skill_name}}" }
+        },
+        {
+          "tag": "button",
+          "text": { "tag": "plain_text", "content": "Archive" },
+          "type": "danger",
+          "value": { "action": "archive", "skill": "{{skill_name}}" }
+        }
+      ]
+    }
+  ]
+}

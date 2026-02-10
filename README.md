@@ -21,7 +21,7 @@
 
 ## 这是什么？
 
-一套**开箱即用**的飞书 API Skill 库，专为 AI Agent（Cursor / Claude / 任何 LLM 编排框架）设计。
+一套**开箱即用**的飞书 API Skill 库，专为 [OpenClaw](https://github.com/nicepkg/openclaw) AI Agent 框架设计。
 
 **不是 SDK，不是代码库** —— 而是一套经过实战验证的 **Prompt 知识模板**，让 AI Agent 直接"学会"怎么正确调用飞书 API。
 
@@ -57,9 +57,9 @@
 
 ## 快速开始
 
-### 方法 1：安装到 OpenClaw（推荐）
+### 安装到 OpenClaw
 
-如果你使用 [OpenClaw](https://github.com/nicepkg/openclaw) AI Agent 框架：
+本项目专为 [OpenClaw](https://github.com/nicepkg/openclaw) AI Agent 框架设计。
 
 ```bash
 # 1. 克隆本仓库
@@ -72,23 +72,14 @@ cp -r feishu_skills/feishu-* ~/.openclaw/workspace/skills/
 # OpenClaw 会自动加载新的 Skills
 ```
 
-### 方法 2：安装到 Cursor
+### 其他 AI Agent 框架
 
-```bash
-# 1. 克隆本仓库
-git clone https://github.com/alextangson/feishu_skills.git
+Skill 本质是 Markdown 文档，理论上可用于任何支持自定义 Prompt 的 AI Agent 框架。
 
-# 2. 复制到 Cursor skills 目录
-cp -r feishu_skills/feishu-* ~/.cursor/skills/
-
-# 3. 重启 Cursor
-```
-
-### 方法 3：其他 AI Agent 框架
-
-将 `feishu-*` 目录复制到你的 Agent 能读取的 Prompt/Knowledge 目录即可。
-
-Skill 本质是 Markdown 文档，任何支持自定义 Prompt 的框架都能用。
+但**强烈建议使用 OpenClaw**，因为：
+- OpenClaw 原生支持 Skill 加载和管理
+- 自动处理飞书 API 认证和调用
+- 提供完整的飞书集成能力
 
 ---
 

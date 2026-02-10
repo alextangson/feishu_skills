@@ -13,7 +13,7 @@
 
 ## 这是什么？
 
-一套**开箱即用**的飞书 API Skill 库，专为 [OpenClaw](https://github.com/nicepkg/openclaw) AI Agent 框架设计。
+一套**开箱即用**的飞书 API Skill 库，专为 [OpenClaw](https://jvbmlo28x0.feishu.cn/wiki/IrlDweqdIi77azkojinciG8xn4d) AI Agent 框架设计。
 
 **不是 SDK，不是代码库** —— 而是 **Prompt 知识模板**，让 AI Agent 直接"学会"怎么正确调用飞书 API。
 
@@ -68,7 +68,7 @@ feishu:
   app_secret: "your_app_secret"
 ```
 
-详细配置请参考 [OpenClaw 文档](https://github.com/nicepkg/openclaw)。
+详细配置请参考 [OpenClaw 文档](https://jvbmlo28x0.feishu.cn/wiki/IrlDweqdIi77azkojinciG8xn4d)。
 
 ---
 
@@ -129,7 +129,7 @@ AI：（自动读取 feishu-bitable Skill）
 
 ### 🔗 相关项目
 
-- [OpenClaw](https://github.com/nicepkg/openclaw) - 开源 AI Agent 运行时
+- [OpenClaw](https://jvbmlo28x0.feishu.cn/wiki/IrlDweqdIi77azkojinciG8xn4d) - 开源 AI Agent 运行时
 
 ---
 

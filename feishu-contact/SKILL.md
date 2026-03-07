@@ -1,93 +1,52 @@
 ---
 name: feishu-contact
-description: 飞书组织架构与 ID 转换 Skill。搜索成员、获取部门信息、创建部门、ID 互转（OpenID/UserID/UnionID）。当需要查找飞书用户、管理组织架构或在不同 ID 体系间转换时使用此 Skill。
+description: 飞书组织架构与 ID 转换。搜索成员、部门管理、ID 互转（OpenID/UserID/UnionID）、Spark ID 转换。
 required_permissions:
   - contact:user.base:readonly
   - directory:department:read
-  - directory:department:write
-  - directory:employee.create:write
   - directory:employee.idconvert:read
-  - directory:department.idconvert:read
-  - directory:job_title.base:read
-  - directory:place.base:read
-  - admin:app.user_usable:readonly
+  - spark:directory.user.id_convert:read
 ---
 
 # 飞书组织架构与 ID 转换
 
-你是飞书通讯录管理专家，负责通过 Contact v3 API 实现成员搜索、部门管理和 ID 转换。
+通过 Contact v3 和 Spark v1 API 实现成员搜索、部门管理和 ID 转换。
 
 ---
 
-## 一、API 基础信息
+## API 基础
 
-| 项目 | 值 |
-|------|---|
-| Base URL | `https://open.feishu.cn/open-apis/contact/v3` |
-| 认证方式 | `Authorization: Bearer {tenant_access_token}` |
-| Content-Type | `application/json` |
-
----
-
-## 二、成员查询
-
-### 1. 搜索成员（通过邮箱/手机号获取 OpenID）
-
-```
-GET /open-apis/contact/v3/users/batch_get_id
-```
-
-**实测心法**：支持邮箱、手机号等多种输入，是对接外部系统的核心桥梁。
-
-### 2. 获取成员职务
-
-```
-GET /open-apis/contact/v3/job_titles/{job_title_id}
-```
-
-**实测心法**：职务信息需在管理后台预先维护。可基于职级进行自动化审批路由。
+| 项目 | Contact v3 | Spark v1 |
+|------|-----------|----------|
+| Base URL | `https://open.feishu.cn/open-apis/contact/v3` | `https://open.feishu.cn/open-apis/spark/v1` |
+| 认证 | `Authorization: Bearer {tenant_access_token}` | 同左 |
 
 ---
 
-## 三、部门管理
+## 成员查询
 
-### 3. 获取部门信息
-
-```
-GET /open-apis/contact/v3/departments/{department_id}
-```
-
-**实测心法**：`department_id` 有多种格式（OpenID / CustomID），注意区分。
-
-### 4. 创建部门
-
-```
-POST /open-apis/contact/v3/departments
-```
-
-```json
-{ "name": "新部门", "parent_department_id": "0" }
-```
-
-**实测心法**：操作敏感，通常需最高管理权限。建议在预发环境多测试。
-
-### 5. 入职成员
-
-```
-POST /open-apis/contact/v3/users
-```
-
-```json
-{ "name": "张三", "mobile": "13800138000", "department_ids": ["od_xxx"] }
-```
-
-**实测心法**：合规性操作，建议在预发环境多测试。
+| API | 端点 | 说明 |
+|-----|------|------|
+| 搜索成员 | `GET /users/batch_get_id` | 通过邮箱/手机号获取 OpenID |
+| 获取职务 | `GET /job_titles/{id}` | 需在管理后台预先维护 |
 
 ---
 
-## 四、ID 转换（核心）
+## 部门管理
 
-飞书有三种用户 ID 体系，对接外部系统时经常需要互转：
+| API | 端点 | 请求体示例 |
+|-----|------|-----------|
+| 获取部门 | `GET /departments/{id}` | - |
+| 创建部门 | `POST /departments` | `{"name":"新部门","parent_department_id":"0"}` |
+| 入职成员 | `POST /users` | `{"name":"张三","mobile":"138...","department_ids":["od_xxx"]}` |
+
+⚠️ 创建部门和入职成员需最高权限，建议预发环境测试。
+
+---
+
+## ID 转换（核心）
+
+飞书三种 ID 体系：
 
 | ID 类型 | 说明 | 使用场景 |
 |---------|------|---------|
@@ -95,47 +54,59 @@ POST /open-apis/contact/v3/users
 | `user_id` | 企业内唯一 | 企业内部系统对接 |
 | `union_id` | 跨应用唯一 | 同一开发者的多个应用间 |
 
-### 6. 用户 ID 转换
+### Contact v3 ID 转换
 
 ```
 POST /open-apis/contact/v3/users/batch_get_id
-```
-
-**实测心法**：对接外部系统（如微信、钉钉）时的核心桥梁。
-
-### 7. 部门 ID 转换
-
-```
 POST /open-apis/contact/v3/departments/batch_get_id
 ```
 
-**实测心法**：处理跨企业租户合并时的利器。
+### Spark v1 ID 转换（推荐）
+
+```
+POST /open-apis/spark/v1/directory/user/id_convert
+```
+
+**请求示例：**
+```json
+{
+  "source_id_type": "open_id",
+  "source_id": "ou_xxx",
+  "target_id_type": "user_id"
+}
+```
+
+**响应示例：**
+```json
+{
+  "code": 0,
+  "data": {
+    "target_id": "7f2a1b3c"
+  }
+}
+```
+
+**支持的 ID 类型：**
+- `open_id` / `user_id` / `union_id`
+
+**权限要求：**
+- `spark:directory.user.id_convert:read`
+
+💡 Spark API 更简洁，推荐用于新项目。
 
 ---
 
-## 五、其他
+## 其他
 
-### 8. 获取办公地点列表
-
-```
-GET /open-apis/contact/v3/places
-```
-
-**实测心法**：地点 ID 可用于人员地理分布分析，适配多地办公的项目组。
-
-### 9. 管理外部成员访问
-
-```
-GET /open-apis/application/v1/applications/{app_id}/user_usable
-```
-
-**实测心法**：控制供应商/外包团队对项目的访问权限，合规性管控的核心。
+| API | 端点 | 说明 |
+|-----|------|------|
+| 办公地点 | `GET /places` | 用于人员地理分布分析 |
+| 外部成员访问 | `GET /application/v1/applications/{app_id}/user_usable` | 控制供应商/外包访问权限 |
 
 ---
 
-## 六、最佳实践
+## 最佳实践
 
-1. **ID 转换先行**：对接外部系统前，先通过 batch_get_id 建立 ID 映射
-2. **权限敏感**：创建部门、入职成员等操作需最高权限，谨慎使用
-3. **缓存 ID**：频繁查询的用户 ID 建议本地缓存，减少 API 调用
-4. **预发测试**：组织架构变更操作务必在预发环境验证
+1. **ID 转换优先用 Spark API**（更简洁）
+2. **缓存常用 ID**（减少 API 调用）
+3. **组织架构变更必须预发测试**

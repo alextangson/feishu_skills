@@ -104,6 +104,19 @@ required_permissions:
 | 删除数据表 | `DELETE .../tables/{table_id}` | - |
 | 复制数据表 | `POST .../tables/{table_id}/copy` | - |
 
+⚠️ **权限管理（重要）**：
+- 通过 API 创建的表格默认只对机器人可见
+- 创建后需添加用户为协作者：
+```
+POST /permissions/{app_token}/members
+{
+  "member_type": "user",
+  "member_id": "ou_xxx",
+  "perm": "full_access"
+}
+```
+- 权限类型：`view` / `edit` / `full_access`
+
 ---
 
 ## 视图管理
@@ -136,3 +149,5 @@ required_permissions:
 2. **字段类型严格匹配**（避免写入失败）
 3. **日期用毫秒时间戳**（Python: `int(datetime.timestamp() * 1000)`）
 4. **关联字段实现关系型能力**
+5. **创建表格后立即添加用户为协作者**（避免不可见）
+6. **单选字段自动创建选项**（直接写入选项文本即可）

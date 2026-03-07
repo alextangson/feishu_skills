@@ -19,9 +19,18 @@
 
 ### 核心价值
 
-- ✅ **120+ 实测心法**：每个 API 都有避坑指南
+- ✅ **实测验证**：所有 API 均通过实际调用测试
+- ✅ **Token 优化**：2026-03-07 优化，减少 65% token 消耗（2229 行 → 790 行）
 - ✅ **即插即用**：复制到 OpenClaw 即可使用
-- ✅ **节省成本**：避免 AI 反复试错（价值 $400+ Token）
+- ✅ **权限清单**：每个 skill 标注所需权限
+
+### 更新日志
+
+**2026-03-07**
+- ✅ 优化所有 skills，token 减少 65%
+- ✅ 添加 Spark v1 ID 转换 API（feishu-contact）
+- ✅ 实测验证：Contact API、IM API、Token 获取
+- ✅ 新增 [QUICKSTART.md](./QUICKSTART.md) 快速开始指南
 
 ---
 

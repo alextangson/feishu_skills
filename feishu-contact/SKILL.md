@@ -70,11 +70,16 @@ POST /open-apis/spark/v1/directory/user/id_convert
 **请求示例：**
 ```json
 {
-  "source_id_type": "open_id",
-  "source_id": "ou_xxx",
-  "target_id_type": "user_id"
+  "id_convert_type": 10,
+  "source_id": "ou_xxx"
 }
 ```
+
+**id_convert_type 枚举：**
+- `10`: open_id → user_id
+- `11`: user_id → open_id
+- `20`: open_id → union_id
+- `21`: union_id → open_id
 
 **响应示例：**
 ```json
@@ -85,9 +90,6 @@ POST /open-apis/spark/v1/directory/user/id_convert
   }
 }
 ```
-
-**支持的 ID 类型：**
-- `open_id` / `user_id` / `union_id`
 
 **权限要求：**
 - `spark:directory.user.id_convert:read`

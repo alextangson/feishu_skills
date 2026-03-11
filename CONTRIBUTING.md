@@ -200,7 +200,7 @@ required_permissions:
 | 项目 | 值 |
 |------|---|
 | Base URL | `https://open.feishu.cn/open-apis/xxx` |
-| 认证方式 | `Authorization: Bearer {tenant_access_token}` |
+| 认证方式 | 先执行 `./scripts/get_feishu_token.sh`，再使用 `Authorization: Bearer {tenant_access_token}` |
 | Content-Type | `application/json` |
 
 ---
@@ -294,8 +294,9 @@ HTTP_METHOD /path/to/endpoint
 
 ```bash
 # 示例：测试发送消息 API
+TOKEN="$(./scripts/get_feishu_token.sh)"
 curl -X POST 'https://open.feishu.cn/open-apis/im/v1/messages' \
-  -H 'Authorization: Bearer YOUR_TOKEN' \
+  -H "Authorization: Bearer ${TOKEN}" \
   -H 'Content-Type: application/json' \
   -d '{
     "receive_id": "ou_xxx",

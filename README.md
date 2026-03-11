@@ -69,15 +69,27 @@ cp -r feishu_skills/feishu-* ~/.openclaw/workspace/skills/
 
 1. 在 [飞书开放平台](https://open.feishu.cn/) 创建企业自建应用
 2. 开通所需权限（每个 Skill 文件顶部有 `required_permissions` 列表）
-3. 在 OpenClaw 配置文件中添加：
+3. 配置环境变量：
 
-```yaml
-feishu:
-  app_id: "your_app_id"
-  app_secret: "your_app_secret"
+```bash
+export FEISHU_APP_ID="your_app_id"
+export FEISHU_APP_SECRET="your_app_secret"
 ```
 
 详细配置请参考 [OpenClaw 文档](https://github.com/openclaw/openclaw)。
+
+### 3. 复用本地 Token 缓存
+
+从 `feishu_skills` 根目录执行：
+
+```bash
+TOKEN="$(./scripts/get_feishu_token.sh)"
+```
+
+- 脚本会把 token 写入 `./.feishu_token_cache.json`
+- 缓存未过期时直接复用，不重复调用换 token 接口
+- 默认在过期前 5 分钟自动刷新
+- 若业务接口返回 token 无效或 401，执行 `./scripts/get_feishu_token.sh --force-refresh` 后重试一次原请求
 
 ---
 
@@ -89,7 +101,7 @@ feishu:
 你：帮我在飞书群里发一条消息，通知大家明天开会
 
 AI：（自动读取 feishu-im Skill）
-好的，我来发送消息...
+好的，我会先读取本地 token 缓存，再发送消息...
 ```
 
 ```
@@ -121,6 +133,15 @@ AI：（自动读取 feishu-bitable Skill）
 - **知识管理**：文档写入 + 知识库 + 文件管理
 - **审批自动化**：审批流 + 消息通知 + 数据记录
 - **团队协作**：群聊管理 + 交互卡片 + 日历排期
+
+---
+
+## Token Helper
+
+- 脚本路径：`./scripts/get_feishu_token.sh`
+- 凭证来源：`FEISHU_APP_ID` / `FEISHU_APP_SECRET`
+- 缓存文件：`./.feishu_token_cache.json`
+- 强制刷新：`./scripts/get_feishu_token.sh --force-refresh`
 
 ---
 

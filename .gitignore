@@ -48,3 +48,9 @@ yarn-error.log*
 *.tmp
 *.temp
 *~
+
+# Feishu token cache
+.feishu_token_cache.json
+.feishu_token_cache.json.lock
+
+/.omx

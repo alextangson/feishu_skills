@@ -1,10 +1,6 @@
 ---
 name: feishu-drive
-description: 飞书云空间文件管理。上传/下载/移动/搜索文件、创建文件夹。
-required_permissions:
-  - drive:file:upload
-  - drive:file:download
-  - drive:drive:readonly
+description: "飞书云空间文件管理。上传/下载/移动/搜索文件、创建文件夹、管理权限和协作者、文件版本管理。Use when 用户需要在飞书中管理文件、上传下载文档、设置文件权限，或提到 Feishu Drive、Lark 云盘、飞书云空间、飞书文件管理。"
 ---
 
 # 飞书云空间文件管理
@@ -145,10 +141,46 @@ file=<binary>
 
 ---
 
-## 最佳实践
+## 常用工作流
 
-1. **创建文件夹后立即添加协作者**（避免不可见）
-2. **大文件用分片上传**（>20MB）
-3. **权限继承**：父文件夹授权后，子文件夹自动继承
-4. **版本管理**：定期清理历史版本节省空间
-5. **订阅通知**：关键文件订阅变更通知，及时响应
+### 创建文件夹并授权协作者
+
+```bash
+# 1. 创建文件夹
+curl -X POST "https://open.feishu.cn/open-apis/drive/v1/folders" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"AI-Workspace","folder_token":"root"}'
+
+# 2. 获取返回的 folder_token，立即添加协作者（避免文件夹不可见）
+curl -X POST "https://open.feishu.cn/open-apis/drive/v1/permissions/{folder_token}/members" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"member_type":"user","member_id":"ou_xxx","perm":"full_access"}'
+
+# 3. 验证：查询文件夹确认可访问
+curl -X GET "https://open.feishu.cn/open-apis/drive/v1/folders/{folder_token}/meta" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+### 安全删除文件
+
+```bash
+# 1. 先查询确认文件存在
+curl -X GET "https://open.feishu.cn/open-apis/drive/v1/files/{file_token}/meta" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+
+# 2. 确认后再删除
+curl -X DELETE "https://open.feishu.cn/open-apis/drive/v1/files/{file_token}" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+---
+
+## 实测心法
+
+1. **创建文件夹后立即添加协作者**——API 创建的文件夹默认只对机器人可见，用户看不到
+2. **大文件用分片上传**（>20MB），小文件用 `upload_all` 一次搞定
+3. **权限继承**：父文件夹授权后子文件夹自动继承，善用这一点减少权限配置
+4. **删除操作不可逆**——没有回收站机制，删了就找不回来
+5. **订阅通知**：关键文件订阅 `file_edit` 变更通知，及时响应协作变化

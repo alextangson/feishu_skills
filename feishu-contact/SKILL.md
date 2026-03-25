@@ -1,10 +1,6 @@
 ---
 name: feishu-contact
-description: 飞书组织架构与 ID 转换。搜索成员、部门管理、ID 互转（OpenID/UserID/UnionID）。
-required_permissions:
-  - contact:user.base:readonly
-  - directory:department:read
-  - directory:employee.idconvert:read
+description: "飞书组织架构与 ID 转换。搜索成员、管理部门/用户组/角色/职级、在 OpenID/UserID/UnionID 之间互转。Use when 用户需要查询飞书用户信息、转换飞书 ID 格式、管理飞书部门或通讯录，或提到 Feishu contact、Lark 通讯录、组织架构。"
 ---
 
 # 飞书组织架构与 ID 转换
@@ -165,8 +161,45 @@ GET /contact/v3/users/ou_xxx?user_id_type=open_id
 
 ---
 
-## 最佳实践
+## 常用工作流
 
-1. **ID 转换优先用 Spark API**（更简洁）
-2. **缓存常用 ID**（减少 API 调用）
-3. **组织架构变更必须预发测试**
+### 通过邮箱查找用户并获取所有 ID
+
+```bash
+# 1. 通过邮箱获取 open_id
+curl -X POST "https://open.feishu.cn/open-apis/contact/v3/users/batch_get_id" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"emails":["user@company.com"]}'
+
+# 2. 用 open_id 获取完整用户信息（包含所有 ID 类型）
+curl -X GET "https://open.feishu.cn/open-apis/contact/v3/users/ou_xxx?user_id_type=open_id" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+**验证**: 检查响应中 `data.user` 包含 `open_id`、`user_id`、`union_id` 三个字段。
+
+### 安全删除部门
+
+```bash
+# 1. 确认部门下无用户
+curl -X GET "https://open.feishu.cn/open-apis/contact/v3/users?department_id=od_xxx" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+
+# 2. 确认无子部门
+curl -X GET "https://open.feishu.cn/open-apis/contact/v3/departments?parent_department_id=od_xxx" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+
+# 3. 确认为空后再删除
+curl -X DELETE "https://open.feishu.cn/open-apis/contact/v3/departments/od_xxx" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+---
+
+## 实测心法
+
+1. **ID 转换优先用 `GET /users/{user_id}` 一次获取所有 ID 类型**——比单独转换接口更简洁
+2. **缓存常用 ID**（减少 API 调用），open_id 在同一应用内不变
+3. **组织架构变更必须预发测试**——删除部门/用户不可逆，生产环境出错代价极高
+4. **batch_get_id 可能返回部分结果**——邮箱或手机号匹配不到时该条目不在响应中，需检查返回数量

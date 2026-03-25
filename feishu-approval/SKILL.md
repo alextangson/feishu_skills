@@ -1,8 +1,6 @@
 ---
 name: feishu-approval
-description: 飞书审批。创建审批实例、查询审批状态。
-required_permissions:
-  - approval:approval
+description: "飞书审批流管理。创建审批实例、查询审批状态、同意/拒绝/撤回/转交审批、管理审批任务和评论。Use when 用户需要在飞书中发起审批、查看审批进度、处理审批请求，或提到 Feishu approval、Lark 审批、审批流程、审批单。"
 ---
 
 # 飞书审批
@@ -124,10 +122,36 @@ curl -X GET "https://open.feishu.cn/open-apis/approval/v4/instances?page_size=20
 
 ---
 
-## 最佳实践
+## 常用工作流
 
-1. **先获取审批定义**（确认 form 字段）
-2. **form 必须字符串化 JSON**
-3. **审批操作需审批人权限**
-4. **分页查询**：大量数据用 page_token 分页
-5. **user_id 必填**：创建实例和查询列表都需要指定 user_id
+### 创建审批实例（完整流程）
+
+```bash
+# 1. 获取审批定义，确认表单字段
+curl -X GET "https://open.feishu.cn/open-apis/approval/v4/approvals/{approval_code}/forms" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+
+# 2. 根据表单定义构造 form JSON 并创建实例
+curl -X POST "https://open.feishu.cn/open-apis/approval/v4/instances" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "approval_code": "7C468A54-8745-2245-9675-08B7C63E7A85",
+    "user_id": "ou_xxx",
+    "form": "{\"widget1\":\"请假3天\"}"
+  }'
+
+# 3. 验证：查询实例状态确认创建成功
+curl -X GET "https://open.feishu.cn/open-apis/approval/v4/instances/{instance_id}" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+---
+
+## 实测心法
+
+1. **先获取审批定义再创建实例**——form 字段必须严格匹配定义中的 widget 结构，否则报错
+2. **form 必须是字符串化的 JSON**，不能直接传对象，这是最常踩的坑
+3. **审批操作需审批人权限**——只有当前审批节点的审批人才能调用 approve/reject
+4. **分页查询**：大量数据用 `page_token` 分页，单次最多 100 条
+5. **user_id 必填**：创建实例和查询列表都需要指定 `user_id`，缺少会返回参数错误

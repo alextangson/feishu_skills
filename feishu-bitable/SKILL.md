@@ -51,6 +51,21 @@ TOKEN="$(./scripts/get_feishu_token.sh --force-refresh)"
 | 批量删除 | `POST .../records/batch_delete` | 最多 500 条 |
 | 查询 | `POST .../records/search` | 支持 filter/sort/分页 |
 
+**分页查询全部记录**（单次最多 500 条，循环直到 `has_more: false`）：
+```python
+page_token = None
+all_records = []
+while True:
+    body = {"page_size": 500}
+    if page_token:
+        body["page_token"] = page_token
+    resp = post(".../records/search", json=body)
+    all_records.extend(resp["data"]["items"])
+    if not resp["data"].get("has_more"):
+        break
+    page_token = resp["data"]["page_token"]
+```
+
 **请求示例**:
 ```json
 {
@@ -183,6 +198,16 @@ POST /permissions/{app_token}/members
 | 更新权限 | `PUT /apps/{app_token}/roles/{role_id}` | - |
 
 **角色类型**: `owner` / `editor` / `reader`
+
+---
+
+## ⚠️ 不存在的接口
+
+`/apps/:app_token/tables/:table_id/statistics` **该接口不存在**，飞书官方文档中未提供统计汇总 API。
+
+如需统计数据（如求和、计数），建议：
+1. 用 `POST .../records/search` 拉取全量记录后在客户端计算
+2. 在多维表格中创建**公式字段**（如 `SUM`、`COUNT`）后通过 API 读取字段值
 
 ---
 

@@ -109,6 +109,38 @@ TOKEN="$(./scripts/get_feishu_token.sh --force-refresh)"
 | 获取会议室 | `/rooms/{room_id}` | GET | - | 查询会议室详情 |
 | 查询会议室忙闲 | `/rooms/{room_id}/freebusy` | GET | - | 查询会议室可用时间 |
 
+### 创建日程并占用会议室
+
+占用会议室的关键：在 `attendees` 中添加 `type: "resource"` 的参与人，`attendee_id` 填会议室的 `room_id`。
+
+**完整流程**：
+
+```bash
+# 1. 获取会议室列表，拿到 room_id
+curl -X GET "https://open.feishu.cn/open-apis/calendar/v4/rooms?page_size=50" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+
+# 2. （可选）查询会议室在目标时间段是否空闲
+curl -X GET "https://open.feishu.cn/open-apis/calendar/v4/rooms/{room_id}/freebusy?start_time=1770508800&end_time=1770512400" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+
+# 3. 创建日程，attendees 中加入会议室
+curl -X POST "https://open.feishu.cn/open-apis/calendar/v4/calendars/primary/events" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "summary": "团队会议",
+    "start_time": {"timestamp": "1770508800"},
+    "end_time": {"timestamp": "1770512400"},
+    "attendees": [
+      {"type": "user", "attendee_id": "ou_xxx"},
+      {"type": "resource", "attendee_id": "omcxxxxxxxxxxxxx"}
+    ]
+  }'
+```
+
+⚠️ 若会议室在该时段已被占用，创建请求会返回冲突错误，请先查询忙闲再预订。
+
 ---
 
 ## 常见参数说明

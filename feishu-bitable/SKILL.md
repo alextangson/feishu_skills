@@ -12,6 +12,28 @@ required_permissions:
 
 **Base URL**: `https://open.feishu.cn/open-apis/bitable/v1`
 
+## 认证与 Token 获取
+
+从 `feishu_skills` 根目录执行共享脚本：
+
+```bash
+TOKEN="$(./scripts/get_feishu_token.sh)"
+```
+
+请求头统一使用 `Authorization: Bearer ${TOKEN}`。
+
+如果业务接口返回 token 无效、过期或 401，强制刷新后仅重试一次原请求：
+
+```bash
+TOKEN="$(./scripts/get_feishu_token.sh --force-refresh)"
+```
+
+**环境变量**:
+- `FEISHU_APP_ID`
+- `FEISHU_APP_SECRET`
+
+**本地缓存**: `./.feishu_token_cache.json`（未过期直接复用，默认提前 5 分钟刷新）
+
 **关键参数**:
 - `app_token`: 多维表格 URL 中 `/base/` 后的字符串
 - `table_id`: 调用列表 API 获取

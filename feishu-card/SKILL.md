@@ -7,7 +7,31 @@ description: 飞书交互卡片。构建和发送带按钮/选择器的消息卡
 
 构建、发送和处理飞书交互卡片。
 
+**Base URL**: `https://open.feishu.cn/open-apis/im/v1`
+
 **使用场景**: 晨报确认、告警处理、任务确认、状态更新
+
+## 认证与 Token 获取
+
+从 `feishu_skills` 根目录执行共享脚本：
+
+```bash
+TOKEN="$(./scripts/get_feishu_token.sh)"
+```
+
+请求头统一使用 `Authorization: Bearer ${TOKEN}`。
+
+如果业务接口返回 token 无效、过期或 401，强制刷新后仅重试一次原请求：
+
+```bash
+TOKEN="$(./scripts/get_feishu_token.sh --force-refresh)"
+```
+
+**环境变量**:
+- `FEISHU_APP_ID`
+- `FEISHU_APP_SECRET`
+
+**本地缓存**: `./.feishu_token_cache.json`（未过期直接复用，默认提前 5 分钟刷新）
 
 ---
 

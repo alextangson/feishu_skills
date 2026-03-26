@@ -11,6 +11,28 @@ required_permissions:
 
 **Base URL**: `https://open.feishu.cn/open-apis/calendar/v4`
 
+## 认证与 Token 获取
+
+从 `feishu_skills` 根目录执行共享脚本：
+
+```bash
+TOKEN="$(./scripts/get_feishu_token.sh)"
+```
+
+请求头统一使用 `Authorization: Bearer ${TOKEN}`。
+
+如果业务接口返回 token 无效、过期或 401，强制刷新后仅重试一次原请求：
+
+```bash
+TOKEN="$(./scripts/get_feishu_token.sh --force-refresh)"
+```
+
+**环境变量**:
+- `FEISHU_APP_ID`
+- `FEISHU_APP_SECRET`
+
+**本地缓存**: `./.feishu_token_cache.json`（未过期直接复用，默认提前 5 分钟刷新）
+
 ---
 
 ## 日程操作
@@ -111,13 +133,13 @@ required_permissions:
 **获取日历列表**:
 ```bash
 curl -X GET "https://open.feishu.cn/open-apis/calendar/v4/calendars?page_size=10" \
-  -H "Authorization: Bearer YOUR_TOKEN"
+  -H "Authorization: Bearer ${TOKEN}"
 ```
 
 **创建日程**:
 ```bash
 curl -X POST "https://open.feishu.cn/open-apis/calendar/v4/calendars/primary/events" \
-  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Authorization: Bearer ${TOKEN}" \
   -H "Content-Type: application/json" \
   -d '{
     "summary": "团队会议",
